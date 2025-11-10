@@ -1,4 +1,4 @@
-### phoenix-config
+# phoenix-config
 ## About
 Config file for Phoenix window manager for Mac OS ([GitHub](https://github.com/kasper/phoenix/))
 
@@ -7,7 +7,34 @@ Based on the config file by jasonm23 ([GitHub](https://github.com/jasonm23/Phoen
 ## Concepts
 Screens are split into a grid that is 12 wide and 6 high. This allows for half, third and quarter window widths, and half and third window heights.
 
-Shortcuts are provided to move windows to halves, quarters, sixths and eighths of the screen, as well as other convenience functions.
+Shortcuts are provided to move windows to halves, quarters, sixths and eighths of the screen mapped out on the keyboard (with ^⌥ modifier) as:
+
+### Halves
+|   |   |   |
+|---|---|---|
+| |▲| |
+|◀︎|▼|▶︎|
+
+### Quarters
+|   |   |
+|---|---|
+|Q|W|
+|A|S|
+
+### Sixths
+|   |   |   |
+|---|---|---|
+|E|R|T|
+|D|F|G|
+
+Also ^⌥C = Left two thirds, ^⌥V = Centre with border, ^⌥B = Right two thirds
+
+### Eighths
+|   |   |   |   |
+|---|---|---|---|
+|Y|U|I|O|
+|H|J|K|L|
+
 
 ## Keyboard Shortcuts
 |Shortcut|Description|
