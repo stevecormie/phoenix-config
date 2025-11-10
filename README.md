@@ -9,6 +9,11 @@ Screens are split into a grid that is 12 wide and 6 high. This allows for half, 
 
 Shortcuts are provided to move windows to halves, quarters, sixths and eighths of the screen mapped out on the keyboard (with ^⌥ modifier) as:
 
+### Full Screen
+|   |
+|---|
+|⏎|
+
 ### Halves
 |   |   |   |
 |---|---|---|
