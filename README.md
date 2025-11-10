@@ -54,4 +54,4 @@ Shortcuts are provided to move windows to halves, quarters, sixths and eighths o
 |^⌥[|Shrink by one row|
 |^⌥]|Grow by one row|
 |^⌥'|Snap focused window to grid|
-|^⌥\\|Snap all windows to grid|
+|^⌥\\ |Snap all windows to grid|
