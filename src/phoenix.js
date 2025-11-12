@@ -409,13 +409,12 @@ let saveScreen = (tag) => {
   let windows = screen.windows({ visible: true });
   if (windows && (windows.length > 0)) {
     let savedWindows = [];
-    for (i = 0; i < windows.length; i++) {
-      let window = windows[i];
+    windows.forEach((window) => {
       //let appName = window.app().name();
       //let frame = window.frame();
       //log(`appName: ${appName}, frame: ${frame.x} ${frame.y} ${frame.width} ${frame.height}`);
       savedWindows.push({appName: window.app().name(), frame: window.frame()});
-    }
+    });
     let screenFrame = screen.flippedVisibleFrame();
     Storage.set(tag, {width: screenFrame.width, height: screenFrame.height, windows: savedWindows});
     showModal(`Saved screen to ${tag}`, 5);
@@ -431,8 +430,7 @@ let restoreScreen = (tag) => {
   } else {
     let windows = savedScreen.windows;
     if (windows && (windows.length > 0)) {
-      for (i = 0; i < windows.length; i++) {
-        let window = windows[i];
+      windows.forEach((window) => {
         let app = focusOrStart(window.appName);
         if (app) {
           //log(`Setting timer for ${window.appName}`);
@@ -444,7 +442,7 @@ let restoreScreen = (tag) => {
             }
           });
         }
-      }
+      });
       showModal(`Restored screen from ${tag}`, 5);
     }
   }
