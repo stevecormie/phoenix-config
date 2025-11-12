@@ -10,16 +10,20 @@ let log = function (o, label = "obj: ") {
   Phoenix.log(JSON.stringify(o))
 }
 
+/*
 _.mixin({
   flatmap(list, iteratee, context) {
     return _.flatten(_.map(list, iteratee, context))
   }
 });
+*/
 
 MARGIN_X = 5;
 MARGIN_Y = 5;
 GRID_WIDTH = 12;
 GRID_HEIGHT = 6;
+
+// Convenience functions
 
 focused = () => Window.focused();
 
@@ -31,14 +35,6 @@ function visible() {
       return false;
     }
   })
-}
-
-Window.prototype.screenFrame = function(screen) {
-  return (screen != null ? screen.flippedVisibleFrame() : void 0) || this.screen().flippedVisibleFrame();
-}
-
-Window.prototype.fullGridFrame = function() {
-  return this.calculateGrid({y: 0, x: 0, width: 1, height: 1});
 }
 
 function snapAllToGrid() { _.map(visible(), win => win.snapToGrid()) }
@@ -55,6 +51,26 @@ changeGridHeight = n => {
   Phoenix.notify(`grid is ${GRID_HEIGHT} tiles high`);
   snapAllToGrid();
   return GRID_HEIGHT;
+}
+
+// Extensions to the Window object
+
+Window.prototype.screenFrame = function(screen) {
+  return (screen != null ? screen.flippedVisibleFrame() : void 0) || this.screen().flippedVisibleFrame();
+}
+
+Window.prototype.calculateGrid = function({x, y, width, height}) {
+  let frame = this.screenFrame();
+  return {
+    y: Math.round(y * frame.height) + MARGIN_Y + frame.y,
+    x: Math.round(x * frame.width) + MARGIN_X + frame.x,
+    width: Math.round(width * frame.width) - 2.0 * MARGIN_X,
+    height: Math.round(height * frame.height) - 2.0 * MARGIN_Y
+  };
+}
+
+Window.prototype.fullGridFrame = function() {
+  return this.calculateGrid({y: 0, x: 0, width: 1, height: 1});
 }
 
 Window.prototype.getBoxSize = function(screen) {
@@ -91,15 +107,6 @@ Window.prototype.snapToGrid = function() {
   if (this.isNormal()) {
     return this.setGrid(this.getGrid());
   }
-}
-
-Window.prototype.calculateGrid = function({x, y, width, height}) {
-  return {
-    y: Math.round(y * this.screenFrame().height) + MARGIN_Y + this.screenFrame().y,
-    x: Math.round(x * this.screenFrame().width) + MARGIN_X + this.screenFrame().x,
-    width: Math.round(width * this.screenFrame().width) - 2.0 * MARGIN_X,
-    height: Math.round(height * this.screenFrame().height) - 2.0 * MARGIN_Y
-  };
 }
 
 Window.prototype.proportionWidth = function() {
@@ -384,8 +391,7 @@ App.focusOrStart = name => {
 }
 
 let showModal = (message, duration) => {
-  let focus = focused();
-  let frame = focus ? focus.screenFrame() : Screen.main().flippedVisibleFrame();
+  let frame = Screen.main().flippedVisibleFrame();
   let modal = Modal.build({
     duration: (duration != undefined) ? duration : 2,
     text: `${message}`
@@ -402,36 +408,53 @@ let showAppName = () => {
   showModal(`App: ${name}`);
 }
 
-let saveScreen = (tag) => {
+let focusedScreen = () => {
   let focus = focused();
-  let screen = (focus != undefined) ? focused().screen() : Screen.main();
+  return (focus != undefined) ? focused().screen() : Screen.main();
+}
+
+let saveScreen = (tag) => {
+  let screen = focusedScreen();
+  let screenFrame = screen.flippedVisibleFrame();
+  //log(`screen width: ${screenFrame.width}, height = ${screenFrame.height}`);
   let windows = screen.windows({ visible: true });
   if (windows && (windows.length > 0)) {
     let savedWindows = [];
     for (i = 0; i < windows.length; i++) {
       let window = windows[i];
+      //let appName = window.app().name();
+      //let frame = window.frame();
+      //log(`appName: ${appName}, frame: ${frame.x}, ${frame.y}, ${frame.width}, ${frame.height}`);
       savedWindows.push({appName: window.app().name(), frame: window.frame()});
     }
-    Storage.set(tag, savedWindows);
+    Storage.set(tag, {width: screenFrame.width, height: screenFrame.height, windows: savedWindows});
     showModal(`Saved screen to ${tag}`, 5);
   }
 }
 
 let restoreScreen = (tag) => {
-  let savedWindows = Storage.get(tag);
-  if (savedWindows && (savedWindows.length > 0)) {
-    for (i = 0; i < savedWindows.length; i++) {
-      let window = savedWindows[i];
-      let app = App.focusOrStart(window.appName);
-      if (app) {
-        Timer.after(1.0, () => {
-          app.focus();
-          let focus = focused();
-          if (focus != undefined) focus.setFrame(window.frame);
-        });
+  let screen = focusedScreen();
+  let screenFrame = screen.flippedVisibleFrame();
+  //log(`screen width: ${screenFrame.width}, height = ${screenFrame.height}`);
+  let savedScreen = Storage.get(tag);
+  if ((screenFrame.width < savedScreen.width) || (screenFrame.height < savedScreen.height)) {
+    showModal(`Incompatible screen for ${tag}`, 5);
+  } else {
+    let windows = savedScreen.windows;
+    if (windows && (windows.length > 0)) {
+      for (i = 0; i < windows.length; i++) {
+        let window = windows[i];
+        let app = App.focusOrStart(window.appName);
+        if (app) {
+          Timer.after(1.0, () => {
+            app.focus();
+            let focus = focused();
+            if (focus != undefined) focus.setFrame(window.frame);
+          });
+        }
       }
+      showModal(`Restored screen from ${tag}`, 5);
     }
-    showModal(`Restored screen from ${tag}`, 5);
   }
 }
 
