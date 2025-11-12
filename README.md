@@ -94,22 +94,22 @@ Apps will be launched if they are not already running.
 |^⌥'|Snap focused window to grid|
 |^⌥\\ |Snap all windows to grid|
 |⇧^⌥1|Save screen to Layout1|
-|^⌥1|Restore screen from Layout1|
 |⇧^⌥2|Save screen to Layout2|
-|^⌥2|Restore screen from Layout2|
 |⇧^⌥3|Save screen to Layout3|
-|^⌥3|Restore screen from Layout3|
 |⇧^⌥4|Save screen to Layout4|
-|^⌥4|Restore screen from Layout4|
 |⇧^⌥5|Save screen to Layout5|
-|^⌥5|Restore screen from Layout5|
 |⇧^⌥6|Save screen to Layout6|
-|^⌥6|Restore screen from Layout6|
 |⇧^⌥7|Save screen to Layout7|
-|^⌥7|Restore screen from Layout7|
 |⇧^⌥8|Save screen to Layout8|
-|^⌥8|Restore screen from Layout8|
 |⇧^⌥9|Save screen to Layout9|
-|^⌥9|Restore screen from Layout9|
 |⇧^⌥0|Save screen to Layout0|
+|^⌥1|Restore screen from Layout1|
+|^⌥2|Restore screen from Layout2|
+|^⌥3|Restore screen from Layout3|
+|^⌥4|Restore screen from Layout4|
+|^⌥5|Restore screen from Layout5|
+|^⌥6|Restore screen from Layout6|
+|^⌥7|Restore screen from Layout7|
+|^⌥8|Restore screen from Layout8|
+|^⌥9|Restore screen from Layout9|
 |^⌥0|Restore screen from Layout0|
