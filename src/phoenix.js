@@ -5,19 +5,6 @@ Phoenix.set({
   openAtLogin: true
 });
 
-let log = function (o, label = "obj: ") {
-  Phoenix.log(`${(new Date()).toISOString()}:: ${label} =>`)
-  Phoenix.log(JSON.stringify(o))
-}
-
-/*
-_.mixin({
-  flatmap(list, iteratee, context) {
-    return _.flatten(_.map(list, iteratee, context))
-  }
-});
-*/
-
 MARGIN_X = 5;
 MARGIN_Y = 5;
 GRID_WIDTH = 12;
@@ -34,23 +21,41 @@ function visible() {
     } else {
       return false;
     }
-  })
+  });
 }
 
 function snapAllToGrid() { _.map(visible(), win => win.snapToGrid()) }
 
-changeGridWidth = n => {
+let log = function (o, label = "obj: ") {
+  Phoenix.log(`${(new Date()).toISOString()}:: ${label} =>`);
+  Phoenix.log(JSON.stringify(o));
+}
+
+let changeGridWidth = n => {
   GRID_WIDTH = Math.max(1, GRID_WIDTH + n);
-  Phoenix.notify(`grid is ${GRID_WIDTH} tiles wide`);
+  Phoenix.notify(`Grid is ${GRID_WIDTH} tiles wide`);
   snapAllToGrid();
   return GRID_WIDTH;
 }
 
-changeGridHeight = n => {
+let changeGridHeight = n => {
   GRID_HEIGHT = Math.max(1, GRID_HEIGHT + n);
-  Phoenix.notify(`grid is ${GRID_HEIGHT} tiles high`);
+  Phoenix.notify(`Grid is ${GRID_HEIGHT} tiles high`);
   snapAllToGrid();
   return GRID_HEIGHT;
+}
+
+let showModal = (message, duration) => {
+  let frame = Screen.main().flippedVisibleFrame();
+  let modal = Modal.build({
+    duration: (duration != undefined) ? duration : 2,
+    text: `${message}`
+  });
+  modal.origin = {
+    x: (frame.width / 2) - modal.frame().width / 2,
+    y: frame.height - 100
+  };
+  modal.show();
 }
 
 // Extensions to the Window object
@@ -122,9 +127,10 @@ Window.prototype.toGrid = function({x, y, width, height}) {
 }
 
 Window.prototype.topRight = function() {
+  let frame = this.frame();
   return {
-    x: this.frame().x + this.frame().width,
-    y: this.frame().y
+    x: frame.x + frame.width,
+    y: frame.y
   };
 }
 
@@ -306,106 +312,91 @@ Window.prototype.toLeftBottomLeft = function() {
   return this.toGrid({x: 0, y: 0.5, width: 0.25, height: 0.5});
 }
 
-windowLeftOneColumn = () => {
-  let frame = focused().getGrid();
+Window.prototype.leftOneColumn = function() {
+  let frame = this.getGrid();
   frame.x = Math.max(frame.x - 1, 0);
-  return focused().setGrid(frame);
+  return this.setGrid(frame);
 }
 
-windowDownOneRow = () => {
-  let frame = focused().getGrid();
+Window.prototype.downOneRow = function() {
+  let frame = this.getGrid();
   frame.y = Math.min(Math.floor(frame.y + 1), GRID_HEIGHT - 1);
-  return focused().setGrid(frame);
+  return this.setGrid(frame);
 }
 
-windowUpOneRow = () => {
-  let frame = focused().getGrid();
+Window.prototype.upOneRow = function() {
+  let frame = this.getGrid();
   frame.y = Math.max(Math.floor(frame.y - 1), 0);
-  return focused().setGrid(frame);
+  return this.setGrid(frame);
 }
 
-windowRightOneColumn = () => {
-  let frame = focused().getGrid();
+Window.prototype.rightOneColumn = function() {
+  let frame = this.getGrid();
   frame.x = Math.min(frame.x + 1, GRID_WIDTH - frame.width);
-  return focused().setGrid(frame);
+  return this.setGrid(frame);
 }
 
-windowGrowOneGridColumn = () => {
-  let frame = focused().getGrid();
+Window.prototype.growOneColumn = function() {
+  let frame = this.getGrid();
   frame.width = Math.min(frame.width + 1, GRID_WIDTH - frame.x);
-  return focused().setGrid(frame);
+  return this.setGrid(frame);
 }
 
-windowShrinkOneGridColumn = () => {
-  let frame = focused().getGrid();
+Window.prototype.shrinkOneColumn = function() {
+  let frame = this.getGrid();
   frame.width = Math.max(frame.width - 1, 1);
-  return focused().setGrid(frame);
+  return this.setGrid(frame);
 }
 
-windowGrowOneGridRow = () => {
-  let frame = focused().getGrid();
+Window.prototype.growOneRow = function() {
+  let frame = this.getGrid();
   frame.height = Math.min(frame.height + 1, GRID_HEIGHT);
-  return focused().setGrid(frame);
+  return this.setGrid(frame);
 }
 
-windowShrinkOneGridRow = () => {
-  let frame = focused().getGrid();
+Window.prototype.shrinkOneRow = function() {
+  let frame = this.getGrid();
   frame.height = Math.max(frame.height - 1, 1);
-  return focused().setGrid(frame);
+  return this.setGrid(frame);
 }
 
-windowToFullHeight = () => {
-  let frame = focused().getGrid();
+Window.prototype.toFullHeight = function() {
+  let frame = this.getGrid();
   frame.y = 0;
   frame.height = GRID_HEIGHT;
-  return focused().setGrid(frame);
+  return this.setGrid(frame);
 }
 
-windowToFullWidth = () => {
-  let frame = focused().getGrid();
+Window.prototype.toFullWidth = function() {
+  let frame = this.getGrid();
   frame.x = 0;
   frame.width = GRID_WIDTH;
-  return focused().setGrid(frame);
+  return this.setGrid(frame);
 }
 
-moveWindowToNextScreen = () => focused().setGrid(focused().getGrid(), focused().screen().next());
-
-moveWindowToPreviousScreen = () => focused().setGrid(focused().getGrid(), focused().screen().previous());
-
-App.prototype.firstWindow = function() {
-  return this.all({
-    visible: true
-  })[0];
+Window.prototype.toNextScreen = function() {
+  return this.setGrid(this.getGrid(), this.screen().next());
 }
 
-App.allWithName = name => _.filter(App.all(), a => a.name() === name);
-
-App.byName = name => {
-  let app = _.first(App.allWithName(name));
-  app.show();
-  return app;
+Window.prototype.toPreviousScreen = function() {
+  return this.setGrid(this.getGrid(), this.screen().previous());
 }
 
-App.focusOrStart = name => {
-  return App.launch(name, { focus: true });
-}
-
-let showModal = (message, duration) => {
-  let frame = Screen.main().flippedVisibleFrame();
-  let modal = Modal.build({
-    duration: (duration != undefined) ? duration : 2,
-    text: `${message}`
-  });
-  modal.origin = {
-    x: (frame.width / 2) - modal.frame().width / 2,
-    y: frame.height - 100
-  };
-  modal.show();
-}
-
-let showAppName = () => {
-  let name = focused().app().name();
+Window.prototype.showAppName = function() {
+  let name = this.app().name();
   showModal(`App: ${name}`);
+}
+
+// Save and restore screens
+
+let focusOrStart = function(name) {
+  let app = App.get(name);
+  if (app == undefined) {
+    //log(`Starting ${name}`);
+    app = App.launch(name, { focus: true });
+  }
+  app.focus();
+  return app;
 }
 
 let focusedScreen = () => {
@@ -415,8 +406,6 @@ let focusedScreen = () => {
 
 let saveScreen = (tag) => {
   let screen = focusedScreen();
-  let screenFrame = screen.flippedVisibleFrame();
-  //log(`screen width: ${screenFrame.width}, height = ${screenFrame.height}`);
   let windows = screen.windows({ visible: true });
   if (windows && (windows.length > 0)) {
     let savedWindows = [];
@@ -424,9 +413,10 @@ let saveScreen = (tag) => {
       let window = windows[i];
       //let appName = window.app().name();
       //let frame = window.frame();
-      //log(`appName: ${appName}, frame: ${frame.x}, ${frame.y}, ${frame.width}, ${frame.height}`);
+      //log(`appName: ${appName}, frame: ${frame.x} ${frame.y} ${frame.width} ${frame.height}`);
       savedWindows.push({appName: window.app().name(), frame: window.frame()});
     }
+    let screenFrame = screen.flippedVisibleFrame();
     Storage.set(tag, {width: screenFrame.width, height: screenFrame.height, windows: savedWindows});
     showModal(`Saved screen to ${tag}`, 5);
   }
@@ -435,7 +425,6 @@ let saveScreen = (tag) => {
 let restoreScreen = (tag) => {
   let screen = focusedScreen();
   let screenFrame = screen.flippedVisibleFrame();
-  //log(`screen width: ${screenFrame.width}, height = ${screenFrame.height}`);
   let savedScreen = Storage.get(tag);
   if ((screenFrame.width < savedScreen.width) || (screenFrame.height < savedScreen.height)) {
     showModal(`Incompatible screen for ${tag}`, 5);
@@ -444,12 +433,15 @@ let restoreScreen = (tag) => {
     if (windows && (windows.length > 0)) {
       for (i = 0; i < windows.length; i++) {
         let window = windows[i];
-        let app = App.focusOrStart(window.appName);
+        let app = focusOrStart(window.appName);
         if (app) {
+          //log(`Setting timer for ${window.appName}`);
           Timer.after(1.0, () => {
-            app.focus();
-            let focus = focused();
-            if (focus != undefined) focus.setFrame(window.frame);
+            appWindows = app.windows({ visible: true });
+            if (appWindows && (appWindows.length > 0)) {
+              //log(`Setting frame for ${app.name()}`);
+              appWindows[0].setFrame(window.frame);
+            }
           });
         }
       }
@@ -458,12 +450,14 @@ let restoreScreen = (tag) => {
   }
 }
 
+// Key bindings
+
 keys = [];
 const bind_key = (key, description, modifier, fn) => keys.push(Key.on(key, modifier, fn));
 const mash = 'alt-ctrl'.split('-');
 const smash = 'alt-ctrl-shift'.split('-');
-bind_key('right', 'To Next Screen', smash, moveWindowToNextScreen);
-bind_key('left', 'To Previous Screen', smash, moveWindowToPreviousScreen);
+bind_key('right', 'To Next Screen', smash, () => focused().toNextScreen());
+bind_key('left', 'To Previous Screen', smash, () => focused().toPreviousScreen());
 bind_key('up', 'Top Half', mash, () => focused().toTopHalf());
 bind_key('down', 'Bottom Half', mash, () => focused().toBottomHalf());
 bind_key('left', 'Left Half', mash, () => focused().toLeftHalf());
@@ -484,7 +478,7 @@ bind_key('C', 'Left Two Thirds', mash, () => focused().toLeftTwoThirds());
 bind_key('V', 'Center With Border', mash, () => focused().toCenterWithBorder(1));
 bind_key('B', 'Right Two Thirds', mash, () => focused().toRightTwoThirds());
 bind_key('return', 'Maximize Window', mash, () => focused().toFullScreen());
-bind_key('space', 'Show App Name', mash, showAppName);
+bind_key('space', 'Show App Name', mash, () => focused().showAppName());
 bind_key('Y', 'Left Top Left', mash, () => focused().toLeftTopLeft());
 bind_key('U', 'Left Top Right', mash, () => focused().toLeftTopRight());
 bind_key('H', 'Left Bottom Left', mash, () => focused().toLeftBottomLeft());
@@ -493,18 +487,18 @@ bind_key('I', 'Right Top Left', mash, () => focused().toRightTopLeft());
 bind_key('O', 'Right Top Right', mash, () => focused().toRightTopRight());
 bind_key('K', 'Right Bottom Left', mash, () => focused().toRightBottomLeft());
 bind_key('L', 'Right Bottom Right', mash, () => focused().toRightBottomRight());
-bind_key(',', 'Move Grid Left', mash, windowLeftOneColumn);
-bind_key('.', 'Move Grid Right', mash, windowRightOneColumn);
-bind_key('N', 'Move Grid Up', mash, windowUpOneRow);
-bind_key('M', 'Move Grid Down', mash, windowDownOneRow);
-bind_key('P', 'Window Full Height', mash, windowToFullHeight);
-bind_key(';', 'Window Full Width', mash, windowToFullWidth);
-bind_key('-', 'Shrink by One Column', mash, windowShrinkOneGridColumn);
-bind_key('=', 'Grow by One Column', mash, windowGrowOneGridColumn);
-bind_key('[', 'Shrink by One Row', mash, windowShrinkOneGridRow);
-bind_key(']', 'Grow by One Row', mash, windowGrowOneGridRow);
+bind_key(',', 'Move Grid Left', mash, () => focused().leftOneColumn());
+bind_key('.', 'Move Grid Right', mash, () => focused().rightOneColumn());
+bind_key('N', 'Move Grid Up', mash, () => focused().upOneRow());
+bind_key('M', 'Move Grid Down', mash, () => focused().downOneRow());
+bind_key('P', 'Window Full Height', mash, () => focused().toFullHeight());
+bind_key(';', 'Window Full Width', mash, () => focused().toFullWidth());
+bind_key('-', 'Shrink by One Column', mash, () => focused().shrinkOneColumn());
+bind_key('=', 'Grow by One Column', mash, () => focused().growOneColumn());
+bind_key('[', 'Shrink by One Row', mash, () => focused().shrinkOneRow());
+bind_key(']', 'Grow by One Row', mash, () => focused().growOneRow());
 bind_key("'", 'Snap focused to grid', mash, () => focused().snapToGrid());
-bind_key('\\', 'Snap all to grid', mash, function(){ visible().map(win => win.snapToGrid()) });
+bind_key('\\', 'Snap all to grid', mash, snapAllToGrid);
 bind_key('1', 'Save screen layout 1', smash, () => saveScreen("Layout1"));
 bind_key('1', 'Restore screen layout 1', mash, () => restoreScreen("Layout1"));
 bind_key('2', 'Save screen layout 2', smash, () => saveScreen("Layout2"));
