@@ -401,7 +401,7 @@ let focusOrStart = function(name) {
 
 let focusedScreen = () => {
   let focus = focused();
-  return (focus != undefined) ? focused().screen() : Screen.main();
+  return (focus != undefined) ? focus.screen() : Screen.main();
 }
 
 let saveScreen = (tag) => {
