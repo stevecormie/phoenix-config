@@ -135,13 +135,13 @@ Window.prototype.topRight = function() {
 }
 
 Window.prototype.toLeft = function() {
-  return _.filter(this.neighbors('west'), function(win) {
+  return _.filter(this.neighbors("west"), function(win) {
     return win.topLeft().x < this.topLeft().x - 10
   });
 }
 
 Window.prototype.toRight = function() {
-  return _.filter(this.neighbors('east'), function(win) {
+  return _.filter(this.neighbors("east"), function(win) {
     return win.topRight().x > this.topRight().x + 10
   });
 }
@@ -385,6 +385,8 @@ Window.prototype.toPreviousScreen = function() {
 Window.prototype.showAppName = function() {
   let name = this.app().name();
   showModal(`App: ${name}`);
+  //let frame = this.frame();
+  //showModal(`App: ${name} (${frame.x} ${frame.y} ${frame.width} ${frame.height})`)
 }
 
 // Save and restore screens
@@ -428,17 +430,17 @@ let restoreScreen = (tag) => {
   if ((screenFrame.width < savedScreen.width) || (screenFrame.height < savedScreen.height)) {
     showModal(`Incompatible screen for ${tag}`, 5);
   } else {
-    let windows = savedScreen.windows;
-    if (windows && (windows.length > 0)) {
-      windows.forEach((window) => {
-        let app = focusOrStart(window.appName);
+    let savedWindows = savedScreen.windows;
+    if (savedWindows && (savedWindows.length > 0)) {
+      savedWindows.forEach((savedWindow) => {
+        let app = focusOrStart(savedWindow.appName);
         if (app) {
           //log(`Setting timer for ${window.appName}`);
           Timer.after(1.0, () => {
             appWindows = app.windows({ visible: true });
             if (appWindows && (appWindows.length > 0)) {
               //log(`Setting frame for ${app.name()}`);
-              appWindows[0].setFrame(window.frame);
+              appWindows[0].setFrame(savedWindow.frame);
             }
           });
         }
@@ -448,74 +450,83 @@ let restoreScreen = (tag) => {
   }
 }
 
+// Events
+
+const windowDidOpenEvent = new Event("windowDidOpen", (window) => {
+  let frame = window.frame();
+  if ((frame.width > 800) && (frame.height > 600)) {
+    window.snapToGrid();
+  }
+});
+
 // Key bindings
 
 keys = [];
 const bind_key = (key, description, modifier, fn) => keys.push(Key.on(key, modifier, fn));
-const mash = 'alt-ctrl'.split('-');
-const smash = 'alt-ctrl-shift'.split('-');
-bind_key('right', 'To Next Screen', smash, () => focused().toNextScreen());
-bind_key('left', 'To Previous Screen', smash, () => focused().toPreviousScreen());
-bind_key('up', 'Top Half', mash, () => focused().toTopHalf());
-bind_key('down', 'Bottom Half', mash, () => focused().toBottomHalf());
-bind_key('left', 'Left Half', mash, () => focused().toLeftHalf());
-bind_key('right', 'Right Half', mash, () => focused().toRightHalf());
-bind_key('Z', 'Left Side Toggle', mash, () => focused().toLeftToggle());
-bind_key('X', 'Right Side Toggle', mash, () => focused().toRightToggle());
-bind_key('Q', 'Top Left', mash, () => focused().toTopLeft());
-bind_key('W', 'Top Right', mash, () => focused().toTopRight());
-bind_key('A', 'Bottom Left', mash, () => focused().toBottomLeft());
-bind_key('S', 'Bottom Right', mash, () => focused().toBottomRight());
-bind_key('E', 'Top Left Third', mash, () => focused().toTopLeftThird());
-bind_key('R', 'Top Middle Third', mash, () => focused().toTopMiddleThird());
-bind_key('T', 'Top Right Third', mash, () => focused().toTopRightThird());
-bind_key('D', 'Bottom Left Third', mash, () => focused().toBottomLeftThird());
-bind_key('F', 'Bottom Middle Third', mash, () => focused().toBottomMiddleThird());
-bind_key('G', 'Bottom Right Third', mash, () => focused().toBottomRightThird());
-bind_key('C', 'Left Two Thirds', mash, () => focused().toLeftTwoThirds());
-bind_key('V', 'Center With Border', mash, () => focused().toCenterWithBorder(1));
-bind_key('B', 'Right Two Thirds', mash, () => focused().toRightTwoThirds());
-bind_key('return', 'Maximize Window', mash, () => focused().toFullScreen());
-bind_key('space', 'Show App Name', mash, () => focused().showAppName());
-bind_key('Y', 'Left Top Left', mash, () => focused().toLeftTopLeft());
-bind_key('U', 'Left Top Right', mash, () => focused().toLeftTopRight());
-bind_key('H', 'Left Bottom Left', mash, () => focused().toLeftBottomLeft());
-bind_key('J', 'Left Bottom Right', mash, () => focused().toLeftBottomRight());
-bind_key('I', 'Right Top Left', mash, () => focused().toRightTopLeft());
-bind_key('O', 'Right Top Right', mash, () => focused().toRightTopRight());
-bind_key('K', 'Right Bottom Left', mash, () => focused().toRightBottomLeft());
-bind_key('L', 'Right Bottom Right', mash, () => focused().toRightBottomRight());
-bind_key(',', 'Move Grid Left', mash, () => focused().leftOneColumn());
-bind_key('.', 'Move Grid Right', mash, () => focused().rightOneColumn());
-bind_key('N', 'Move Grid Up', mash, () => focused().upOneRow());
-bind_key('M', 'Move Grid Down', mash, () => focused().downOneRow());
-bind_key('P', 'Window Full Height', mash, () => focused().toFullHeight());
-bind_key(';', 'Window Full Width', mash, () => focused().toFullWidth());
-bind_key('-', 'Shrink by One Column', mash, () => focused().shrinkOneColumn());
-bind_key('=', 'Grow by One Column', mash, () => focused().growOneColumn());
-bind_key('[', 'Shrink by One Row', mash, () => focused().shrinkOneRow());
-bind_key(']', 'Grow by One Row', mash, () => focused().growOneRow());
-bind_key("'", 'Snap focused to grid', mash, () => focused().snapToGrid());
-bind_key('\\', 'Snap all to grid', mash, snapAllToGrid);
-bind_key('1', 'Save screen layout 1', smash, () => saveScreen("Layout1"));
-bind_key('1', 'Restore screen layout 1', mash, () => restoreScreen("Layout1"));
-bind_key('2', 'Save screen layout 2', smash, () => saveScreen("Layout2"));
-bind_key('2', 'Restore screen layout 2', mash, () => restoreScreen("Layout2"));
-bind_key('3', 'Save screen layout 3', smash, () => saveScreen("Layout3"));
-bind_key('3', 'Restore screen layout 3', mash, () => restoreScreen("Layout3"));
-bind_key('4', 'Save screen layout 4', smash, () => saveScreen("Layout4"));
-bind_key('4', 'Restore screen layout 4', mash, () => restoreScreen("Layout4"));
-bind_key('5', 'Save screen layout 5', smash, () => saveScreen("Layout5"));
-bind_key('5', 'Restore screen layout 5', mash, () => restoreScreen("Layout5"));
-bind_key('6', 'Save screen layout 6', smash, () => saveScreen("Layout6"));
-bind_key('6', 'Restore screen layout 6', mash, () => restoreScreen("Layout6"));
-bind_key('7', 'Save screen layout 7', smash, () => saveScreen("Layout7"));
-bind_key('7', 'Restore screen layout 7', mash, () => restoreScreen("Layout7"));
-bind_key('8', 'Save screen layout 8', smash, () => saveScreen("Layout8"));
-bind_key('8', 'Restore screen layout 8', mash, () => restoreScreen("Layout8"));
-bind_key('9', 'Save screen layout 9', smash, () => saveScreen("Layout9"));
-bind_key('9', 'Restore screen layout 9', mash, () => restoreScreen("Layout9"));
-bind_key('0', 'Save screen layout 0', smash, () => saveScreen("Layout0"));
-bind_key('0', 'Restore screen layout 0', mash, () => restoreScreen("Layout0"));
+const mash = "alt-ctrl".split('-');
+const smash = "alt-ctrl-shift".split('-');
+bind_key("right", "To Next Screen", smash, () => focused().toNextScreen());
+bind_key("left", "To Previous Screen", smash, () => focused().toPreviousScreen());
+bind_key("up", "Top Half", mash, () => focused().toTopHalf());
+bind_key("down", "Bottom Half", mash, () => focused().toBottomHalf());
+bind_key("left", "Left Half", mash, () => focused().toLeftHalf());
+bind_key("right", "Right Half", mash, () => focused().toRightHalf());
+bind_key('Z', "Left Side Toggle", mash, () => focused().toLeftToggle());
+bind_key('X', "Right Side Toggle", mash, () => focused().toRightToggle());
+bind_key('Q', "Top Left", mash, () => focused().toTopLeft());
+bind_key('W', "Top Right", mash, () => focused().toTopRight());
+bind_key('A', "Bottom Left", mash, () => focused().toBottomLeft());
+bind_key('S', "Bottom Right", mash, () => focused().toBottomRight());
+bind_key('E', "Top Left Third", mash, () => focused().toTopLeftThird());
+bind_key('R', "Top Middle Third", mash, () => focused().toTopMiddleThird());
+bind_key('T', "Top Right Third", mash, () => focused().toTopRightThird());
+bind_key('D', "Bottom Left Third", mash, () => focused().toBottomLeftThird());
+bind_key('F', "Bottom Middle Third", mash, () => focused().toBottomMiddleThird());
+bind_key('G', "Bottom Right Third", mash, () => focused().toBottomRightThird());
+bind_key('C', "Left Two Thirds", mash, () => focused().toLeftTwoThirds());
+bind_key('V', "Center With Border", mash, () => focused().toCenterWithBorder(1));
+bind_key('B', "Right Two Thirds", mash, () => focused().toRightTwoThirds());
+bind_key("return", "Maximize Window", mash, () => focused().toFullScreen());
+bind_key("space", "Show App Name", mash, () => focused().showAppName());
+bind_key('Y', "Left Top Left", mash, () => focused().toLeftTopLeft());
+bind_key('U', "Left Top Right", mash, () => focused().toLeftTopRight());
+bind_key('H', "Left Bottom Left", mash, () => focused().toLeftBottomLeft());
+bind_key('J', "Left Bottom Right", mash, () => focused().toLeftBottomRight());
+bind_key('I', "Right Top Left", mash, () => focused().toRightTopLeft());
+bind_key('O', "Right Top Right", mash, () => focused().toRightTopRight());
+bind_key('K', "Right Bottom Left", mash, () => focused().toRightBottomLeft());
+bind_key('L', "Right Bottom Right", mash, () => focused().toRightBottomRight());
+bind_key(',', "Move Grid Left", mash, () => focused().leftOneColumn());
+bind_key('.', "Move Grid Right", mash, () => focused().rightOneColumn());
+bind_key('N', "Move Grid Up", mash, () => focused().upOneRow());
+bind_key('M', "Move Grid Down", mash, () => focused().downOneRow());
+bind_key('P', "Window Full Height", mash, () => focused().toFullHeight());
+bind_key(';', "Window Full Width", mash, () => focused().toFullWidth());
+bind_key('-', "Shrink by One Column", mash, () => focused().shrinkOneColumn());
+bind_key('=', "Grow by One Column", mash, () => focused().growOneColumn());
+bind_key('[', "Shrink by One Row", mash, () => focused().shrinkOneRow());
+bind_key(']', "Grow by One Row", mash, () => focused().growOneRow());
+bind_key("'", "Snap focused to grid", mash, () => focused().snapToGrid());
+bind_key("\\", "Snap all to grid", mash, snapAllToGrid);
+bind_key('1', "Save screen layout 1", smash, () => saveScreen("Layout1"));
+bind_key('1', "Restore screen layout 1", mash, () => restoreScreen("Layout1"));
+bind_key('2', "Save screen layout 2", smash, () => saveScreen("Layout2"));
+bind_key('2', "Restore screen layout 2", mash, () => restoreScreen("Layout2"));
+bind_key('3', "Save screen layout 3", smash, () => saveScreen("Layout3"));
+bind_key('3', "Restore screen layout 3", mash, () => restoreScreen("Layout3"));
+bind_key('4', "Save screen layout 4", smash, () => saveScreen("Layout4"));
+bind_key('4', "Restore screen layout 4", mash, () => restoreScreen("Layout4"));
+bind_key('5', "Save screen layout 5", smash, () => saveScreen("Layout5"));
+bind_key('5', "Restore screen layout 5", mash, () => restoreScreen("Layout5"));
+bind_key('6', "Save screen layout 6", smash, () => saveScreen("Layout6"));
+bind_key('6', "Restore screen layout 6", mash, () => restoreScreen("Layout6"));
+bind_key('7', "Save screen layout 7", smash, () => saveScreen("Layout7"));
+bind_key('7', "Restore screen layout 7", mash, () => restoreScreen("Layout7"));
+bind_key('8', "Save screen layout 8", smash, () => saveScreen("Layout8"));
+bind_key('8', "Restore screen layout 8", mash, () => restoreScreen("Layout8"));
+bind_key('9', "Save screen layout 9", smash, () => saveScreen("Layout9"));
+bind_key('9', "Restore screen layout 9", mash, () => restoreScreen("Layout9"));
+bind_key('0', "Save screen layout 0", smash, () => saveScreen("Layout0"));
+bind_key('0', "Restore screen layout 0", mash, () => restoreScreen("Layout0"));
 
 Phoenix.notify("All ok.")
