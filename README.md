@@ -7,6 +7,8 @@ Based on the config file by jasonm23 ([GitHub](https://github.com/jasonm23/Phoen
 ## Grid
 Screens are split into a grid that is 12 wide and 6 high. This allows for half, third and quarter window widths, and half and third window heights.
 
+Windows are snapped to the grid when they open.
+
 Shortcuts are provided to move windows to halves, quarters, sixths and eighths of the screen mapped out on the keyboard (with ^⌥ modifier) as:
 
 ### Full Screen
