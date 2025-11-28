@@ -176,14 +176,8 @@ Window.prototype.forgetFrame = function() {
 }
 
 Window.prototype.togglingWidth = function() {
-  switch (this.proportionWidth()) {
-    case 0.75:
-      return 0.5;
-    case 0.5:
-      return 0.25;
-    default:
-      return 0.75;
-  }
+  let proportion = this.proportionWidth();
+  return (proportion > 0.5) ? 0.5 : (proportion > 0.25) ? 0.25 : 0.75;
 }
 
 Window.prototype.toTopHalf = function() {
