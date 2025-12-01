@@ -12,6 +12,11 @@ GRID_HEIGHT = 6;
 
 // Convenience functions
 
+let log = function (o, label = "obj: ") {
+  Phoenix.log(`${(new Date()).toISOString()}:: ${label} =>`);
+  Phoenix.log(JSON.stringify(o));
+}
+
 focused = () => Window.focused();
 
 function visible() { 
@@ -25,11 +30,6 @@ function visible() {
 }
 
 function snapAllToGrid() { _.map(visible(), win => win.snapToGrid()) }
-
-let log = function (o, label = "obj: ") {
-  Phoenix.log(`${(new Date()).toISOString()}:: ${label} =>`);
-  Phoenix.log(JSON.stringify(o));
-}
 
 let changeGridWidth = n => {
   GRID_WIDTH = Math.max(1, GRID_WIDTH + n);
@@ -58,13 +58,22 @@ let showModal = (message, duration) => {
   modal.show();
 }
 
+let gridCenterWithBorder = (border = 1) => {
+  return {
+    x: border,
+    y: border,
+    width: GRID_WIDTH - (border * 2),
+    height: GRID_HEIGHT - (border * 2)
+  };
+}
+
 // Extensions to the Window object
 
 Window.prototype.screenFrame = function(screen) {
-  return (screen != null ? screen.flippedVisibleFrame() : void 0) || this.screen().flippedVisibleFrame();
+  return screen != null ? screen.flippedVisibleFrame() : this.screen().flippedVisibleFrame();
 }
 
-Window.prototype.calculateGrid = function({x, y, width, height}) {
+Window.prototype.calculateFrame = function({x, y, width, height}) {
   let frame = this.screenFrame();
   return {
     y: Math.round(y * frame.height) + MARGIN_Y + frame.y,
@@ -75,7 +84,7 @@ Window.prototype.calculateGrid = function({x, y, width, height}) {
 }
 
 Window.prototype.fullGridFrame = function() {
-  return this.calculateGrid({y: 0, x: 0, width: 1, height: 1});
+  return this.calculateFrame({y: 0, x: 0, width: 1, height: 1});
 }
 
 Window.prototype.getBoxSize = function(screen) {
@@ -122,8 +131,8 @@ Window.prototype.proportionWidth = function() {
 }
 
 Window.prototype.toGrid = function({x, y, width, height}) {
-  let rect = this.calculateGrid({x, y, width, height});
-  return this.setFrame(rect);
+  let frame = this.calculateFrame({x, y, width, height});
+  return this.setFrame(frame);
 }
 
 Window.prototype.topRight = function() {
@@ -136,13 +145,13 @@ Window.prototype.topRight = function() {
 
 Window.prototype.toLeft = function() {
   return _.filter(this.neighbors("west"), function(win) {
-    return win.topLeft().x < this.topLeft().x - 10
+    return win.topLeft().x < this.topLeft().x - 10;
   });
 }
 
 Window.prototype.toRight = function() {
   return _.filter(this.neighbors("east"), function(win) {
-    return win.topRight().x > this.topRight().x + 10
+    return win.topRight().x > this.topRight().x + 10;
   });
 }
 
@@ -216,14 +225,7 @@ Window.prototype.toRightToggle = function() {
 }
 
 Window.prototype.toCenterWithBorder = function(border = 1) {
-  let [boxWidth, boxHeight] = this.getBoxSize();
-  let rect = { 
-               x: border,
-               y: border, 
-               width: GRID_WIDTH - (border * 2), 
-               height: GRID_HEIGHT - (border * 2) 
-             };
-  this.setGrid(rect);
+  this.setGrid(gridCenterWithBorder(border));
 }
 
 Window.prototype.toTopRight = function() {
@@ -369,11 +371,11 @@ Window.prototype.toFullWidth = function() {
 }
 
 Window.prototype.toNextScreen = function() {
-  return this.setGrid(this.getGrid(), this.screen().next());
+  return this.setGrid(gridCenterWithBorder(), this.screen().next());
 }
 
 Window.prototype.toPreviousScreen = function() {
-  return this.setGrid(this.getGrid(), this.screen().previous());
+  return this.setGrid(gridCenterWithBorder(), this.screen().previous());
 }
 
 Window.prototype.showAppName = function() {
@@ -478,7 +480,7 @@ bind_key('D', "Bottom Left Third", mash, () => focused().toBottomLeftThird());
 bind_key('F', "Bottom Middle Third", mash, () => focused().toBottomMiddleThird());
 bind_key('G', "Bottom Right Third", mash, () => focused().toBottomRightThird());
 bind_key('C', "Left Two Thirds", mash, () => focused().toLeftTwoThirds());
-bind_key('V', "Center With Border", mash, () => focused().toCenterWithBorder(1));
+bind_key('V', "Center With Border", mash, () => focused().toCenterWithBorder());
 bind_key('B', "Right Two Thirds", mash, () => focused().toRightTwoThirds());
 bind_key("return", "Maximize Window", mash, () => focused().toFullScreen());
 bind_key("space", "Show App Name", mash, () => focused().showAppName());
