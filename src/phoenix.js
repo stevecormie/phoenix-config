@@ -5,10 +5,10 @@ Phoenix.set({
   openAtLogin: true
 });
 
-MARGIN_X = 5;
-MARGIN_Y = 5;
-GRID_WIDTH = 12;
-GRID_HEIGHT = 6;
+const MARGIN_X = 5;
+const MARGIN_Y = 5;
+const GRID_WIDTH = 12;
+const GRID_HEIGHT = 6;
 
 // Convenience functions
 
@@ -17,9 +17,9 @@ let log = function (o, label = "obj: ") {
   Phoenix.log(JSON.stringify(o));
 }
 
-focused = () => Window.focused();
+let focused = () => Window.focused();
 
-function visible() { 
+let visible = () => { 
   return Window.all().filter( w => {
     if (w != undefined) { 
       return w.isVisible();
@@ -29,7 +29,9 @@ function visible() {
   });
 }
 
-function snapAllToGrid() { _.map(visible(), win => win.snapToGrid()) }
+let snapAllToGrid = () => {
+  _.map(visible(), win => win.snapToGrid());
+}
 
 let changeGridWidth = n => {
   GRID_WIDTH = Math.max(1, GRID_WIDTH + n);
@@ -74,7 +76,7 @@ Window.prototype.screenFrame = function(screen) {
 }
 
 Window.prototype.calculateFrame = function({x, y, width, height}) {
-  let frame = this.screenFrame();
+  const frame = this.screenFrame();
   return {
     y: Math.round(y * frame.height) + MARGIN_Y + frame.y,
     x: Math.round(x * frame.width) + MARGIN_X + frame.x,
@@ -88,27 +90,26 @@ Window.prototype.fullGridFrame = function() {
 }
 
 Window.prototype.getBoxSize = function(screen) {
-  let frame = this.screenFrame(screen);
+  const frame = this.screenFrame(screen);
   return [frame.width / GRID_WIDTH, frame.height / GRID_HEIGHT];
 }
 
 Window.prototype.getGrid = function() {
-  let [boxWidth, boxHeight] = this.getBoxSize();
-  let frame = this.frame();
-  let screenFrame = this.screenFrame();
-  let grid = {
+  const [boxWidth, boxHeight] = this.getBoxSize();
+  const frame = this.frame();
+  const screenFrame = this.screenFrame();
+  return {
     x: Math.round((frame.x - screenFrame.x) / boxWidth),
     y: Math.round((frame.y - screenFrame.y) / boxHeight),
     width: Math.max(1, Math.round(frame.width / boxWidth)),
     height: Math.max(1, Math.round(frame.height / boxHeight))
   };
-  return grid;
 }
 
 Window.prototype.setGrid = function({y, x, width, height}, screen) {
-  let [boxWidth, boxHeight] = this.getBoxSize(screen);
-  let screenFrame = this.screenFrame(screen);
-  let frame = {
+  const [boxWidth, boxHeight] = this.getBoxSize(screen);
+  const screenFrame = this.screenFrame(screen);
+  const frame = {
     x: (x * boxWidth) + screenFrame.x + MARGIN_X,
     y: (y * boxHeight) + screenFrame.y + MARGIN_Y,
     width: (width * boxWidth) - (MARGIN_X * 2.0),
@@ -124,19 +125,18 @@ Window.prototype.snapToGrid = function() {
 }
 
 Window.prototype.proportionWidth = function() {
-  let s_w, w_w;
-  s_w = this.screenFrame().width;
-  w_w = this.frame().width;
+  const s_w = this.screenFrame().width;
+  const w_w = this.frame().width;
   return Math.round((w_w / s_w) * 100) / 100;
 }
 
 Window.prototype.toGrid = function({x, y, width, height}) {
-  let frame = this.calculateFrame({x, y, width, height});
+  const frame = this.calculateFrame({x, y, width, height});
   return this.setFrame(frame);
 }
 
 Window.prototype.topRight = function() {
-  let frame = this.frame();
+  const frame = this.frame();
   return {
     x: frame.x + frame.width,
     y: frame.y
@@ -156,11 +156,11 @@ Window.prototype.toRight = function() {
 }
 
 Window.prototype.info = function() {
-  let f = this.frame();
+  const f = this.frame();
   return `[${this.app().processIdentifier()}] ${this.app().name()} : ${this.title()}\n{x:${f.x}, y:${f.y}, width:${f.width}, height:${f.height}}\n`;
 }
 
-lastFrames = {};
+let lastFrames = {};
 
 Window.prototype.toFullScreen = function(toggle = true) {
   if (!_.isEqual(this.frame(), this.fullGridFrame())) {
@@ -185,7 +185,7 @@ Window.prototype.forgetFrame = function() {
 }
 
 Window.prototype.togglingWidth = function() {
-  let proportion = this.proportionWidth();
+  const proportion = this.proportionWidth();
   return (proportion > 0.5) ? 0.5 : (proportion > 0.25) ? 0.25 : 0.75;
 }
 
@@ -215,7 +215,7 @@ Window.prototype.toLeftToggle = function() {
 }
 
 Window.prototype.toRightToggle = function() {
-  let newWidth = this.togglingWidth();
+  const newWidth = this.togglingWidth();
   return this.toGrid({
     x: 1 - newWidth,
     y: 0,
@@ -309,62 +309,62 @@ Window.prototype.toLeftBottomLeft = function() {
 }
 
 Window.prototype.leftOneColumn = function() {
-  let frame = this.getGrid();
+  const frame = this.getGrid();
   frame.x = Math.max(frame.x - 1, 0);
   return this.setGrid(frame);
 }
 
 Window.prototype.downOneRow = function() {
-  let frame = this.getGrid();
+  const frame = this.getGrid();
   frame.y = Math.min(Math.floor(frame.y + 1), GRID_HEIGHT - 1);
   return this.setGrid(frame);
 }
 
 Window.prototype.upOneRow = function() {
-  let frame = this.getGrid();
+  const frame = this.getGrid();
   frame.y = Math.max(Math.floor(frame.y - 1), 0);
   return this.setGrid(frame);
 }
 
 Window.prototype.rightOneColumn = function() {
-  let frame = this.getGrid();
+  const frame = this.getGrid();
   frame.x = Math.min(frame.x + 1, GRID_WIDTH - frame.width);
   return this.setGrid(frame);
 }
 
 Window.prototype.growOneColumn = function() {
-  let frame = this.getGrid();
+  const frame = this.getGrid();
   frame.width = Math.min(frame.width + 1, GRID_WIDTH - frame.x);
   return this.setGrid(frame);
 }
 
 Window.prototype.shrinkOneColumn = function() {
-  let frame = this.getGrid();
+  const frame = this.getGrid();
   frame.width = Math.max(frame.width - 1, 1);
   return this.setGrid(frame);
 }
 
 Window.prototype.growOneRow = function() {
-  let frame = this.getGrid();
+  const frame = this.getGrid();
   frame.height = Math.min(frame.height + 1, GRID_HEIGHT);
   return this.setGrid(frame);
 }
 
 Window.prototype.shrinkOneRow = function() {
-  let frame = this.getGrid();
+  const frame = this.getGrid();
   frame.height = Math.max(frame.height - 1, 1);
   return this.setGrid(frame);
 }
 
 Window.prototype.toFullHeight = function() {
-  let frame = this.getGrid();
+  const frame = this.getGrid();
   frame.y = 0;
   frame.height = GRID_HEIGHT;
   return this.setGrid(frame);
 }
 
 Window.prototype.toFullWidth = function() {
-  let frame = this.getGrid();
+  const frame = this.getGrid();
   frame.x = 0;
   frame.width = GRID_WIDTH;
   return this.setGrid(frame);
@@ -379,10 +379,8 @@ Window.prototype.toPreviousScreen = function() {
 }
 
 Window.prototype.showAppName = function() {
-  let name = this.app().name();
+  const name = this.app().name();
   showModal(`App: ${name}`);
-  //let frame = this.frame();
-  //showModal(`App: ${name} (${frame.x} ${frame.y} ${frame.width} ${frame.height})`)
 }
 
 // Save and restore screens
@@ -390,7 +388,6 @@ Window.prototype.showAppName = function() {
 let focusOrStart = function(name) {
   let app = App.get(name);
   if (app == undefined) {
-    //log(`Starting ${name}`);
     app = App.launch(name, { focus: true });
   }
   app.focus();
@@ -398,44 +395,39 @@ let focusOrStart = function(name) {
 }
 
 let focusedScreen = () => {
-  let focus = focused();
+  const focus = focused();
   return (focus != undefined) ? focus.screen() : Screen.main();
 }
 
 let saveScreen = (tag) => {
-  let screen = focusedScreen();
-  let windows = screen.windows({ visible: true });
+  const screen = focusedScreen();
+  const windows = screen.windows({ visible: true });
   if (windows && (windows.length > 0)) {
     let savedWindows = [];
     windows.forEach((window) => {
-      //let appName = window.app().name();
-      //let frame = window.frame();
-      //log(`appName: ${appName}, frame: ${frame.x} ${frame.y} ${frame.width} ${frame.height}`);
-      savedWindows.push({appName: window.app().name(), frame: window.frame()});
+     savedWindows.push({appName: window.app().name(), frame: window.frame()});
     });
-    let screenFrame = screen.flippedVisibleFrame();
+    const screenFrame = screen.flippedVisibleFrame();
     Storage.set(tag, {width: screenFrame.width, height: screenFrame.height, windows: savedWindows});
     showModal(`Saved screen to ${tag}`, 5);
   }
 }
 
 let restoreScreen = (tag) => {
-  let screen = focusedScreen();
-  let screenFrame = screen.flippedVisibleFrame();
-  let savedScreen = Storage.get(tag);
+  const screen = focusedScreen();
+  const screenFrame = screen.flippedVisibleFrame();
+  const savedScreen = Storage.get(tag);
   if ((screenFrame.width < savedScreen.width) || (screenFrame.height < savedScreen.height)) {
     showModal(`Incompatible screen for ${tag}`, 5);
   } else {
-    let savedWindows = savedScreen.windows;
+    const savedWindows = savedScreen.windows;
     if (savedWindows && (savedWindows.length > 0)) {
       savedWindows.forEach((savedWindow) => {
-        let app = focusOrStart(savedWindow.appName);
+        const app = focusOrStart(savedWindow.appName);
         if (app) {
-          //log(`Setting timer for ${window.appName}`);
           Timer.after(1.0, () => {
-            appWindows = app.windows({ visible: true });
+            const appWindows = app.windows({ visible: true });
             if (appWindows && (appWindows.length > 0)) {
-              //log(`Setting frame for ${app.name()}`);
               appWindows[0].setFrame(savedWindow.frame);
             }
           });
@@ -449,7 +441,7 @@ let restoreScreen = (tag) => {
 // Events
 
 const windowDidOpenEvent = new Event("windowDidOpen", (window) => {
-  let frame = window.frame();
+  const frame = window.frame();
   if ((frame.width > 800) && (frame.height > 600)) {
     window.snapToGrid();
   }
@@ -457,7 +449,7 @@ const windowDidOpenEvent = new Event("windowDidOpen", (window) => {
 
 // Key bindings
 
-keys = [];
+let keys = [];
 const bind_key = (key, description, modifier, fn) => keys.push(Key.on(key, modifier, fn));
 const mash = "alt-ctrl".split('-');
 const smash = "alt-ctrl-shift".split('-');
