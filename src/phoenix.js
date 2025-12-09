@@ -69,6 +69,16 @@ let gridCenterWithBorder = (border = 1) => {
   };
 }
 
+let toggleDarkMode = () => {
+  Task.run(
+    '/usr/bin/osascript',
+    [
+      '-l', 'JavaScript',
+      '-e', 'Application("System Events").appearancePreferences.darkMode.set(!Application("System Events").appearancePreferences.darkMode());'
+    ]
+  );
+}
+
 // Extensions to the Window object
 
 Window.prototype.screenFrame = function(screen) {
@@ -516,5 +526,6 @@ bind_key('9', "Save screen layout 9", smash, () => saveScreen("Layout9"));
 bind_key('9', "Restore screen layout 9", mash, () => restoreScreen("Layout9"));
 bind_key('0', "Save screen layout 0", smash, () => saveScreen("Layout0"));
 bind_key('0', "Restore screen layout 0", mash, () => restoreScreen("Layout0"));
+bind_key('D', "Toggle Dark Mode", smash, () => toggleDarkMode());
 
 Phoenix.notify("All ok.")

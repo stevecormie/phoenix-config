@@ -52,6 +52,7 @@ Apps will be launched if they are not already running.
 ## Keyboard Shortcuts
 |Shortcut|Description|
 |---|---|
+|⇧^⌥D|Toggle dark mode|
 |⇧^⌥◀︎|Move to previous screen|
 |⇧^⌥▶︎|Move to next screen|
 |^⌥Space|Show application name|
