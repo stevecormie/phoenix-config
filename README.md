@@ -52,7 +52,6 @@ Apps will be launched if they are not already running.
 ## Keyboard Shortcuts
 |Shortcut|Description|
 |---|---|
-|⇧^⌥D|Toggle dark mode|
 |⇧^⌥◀︎|Move to previous screen|
 |⇧^⌥▶︎|Move to next screen|
 |^⌥Space|Show application name|
@@ -116,3 +115,5 @@ Apps will be launched if they are not already running.
 |^⌥8|Restore screen from Layout8|
 |^⌥9|Restore screen from Layout9|
 |^⌥0|Restore screen from Layout0|
+|⇧^⌥D|Toggle dark mode|
+|⇧^⌥T|Toggle Tailscale status|
