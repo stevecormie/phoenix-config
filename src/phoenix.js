@@ -79,6 +79,27 @@ let toggleDarkMode = () => {
   );
 }
 
+/* Toggle the status of Tailscale, where toggletailscale.sh contains:
+
+#!/bin/bash
+TAILSCALE="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
+if [ -f $TAILSCALE ]; then
+    $TAILSCALE status > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        COMMAND="down"
+    else
+        COMMAND="up"
+    fi
+    $TAILSCALE $COMMAND > /dev/null 2>&1
+    exit $?
+fi
+exit 1
+
+*/
+let toggleTailscale = () => {
+  Task.run('/bin/bash', ['/Users/scormie/bin/toggletailscale.sh']);
+}
+
 // Extensions to the Window object
 
 Window.prototype.screenFrame = function(screen) {
@@ -526,6 +547,7 @@ bind_key('9', "Save screen layout 9", smash, () => saveScreen("Layout9"));
 bind_key('9', "Restore screen layout 9", mash, () => restoreScreen("Layout9"));
 bind_key('0', "Save screen layout 0", smash, () => saveScreen("Layout0"));
 bind_key('0', "Restore screen layout 0", mash, () => restoreScreen("Layout0"));
-bind_key('D', "Toggle Dark Mode", smash, () => toggleDarkMode());
+bind_key('D', "Toggle Dark Mode", smash, toggleDarkMode);
+bind_key('T', "Toggle Tailscale", smash, toggleTailscale);
 
 Phoenix.notify("All ok.")
