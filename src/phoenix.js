@@ -60,15 +60,6 @@ let showModal = (message, duration) => {
   modal.show();
 }
 
-let gridCenterWithBorder = (border = 1) => {
-  return {
-    x: border,
-    y: border,
-    width: GRID_WIDTH - (border * 2),
-    height: GRID_HEIGHT - (border * 2)
-  };
-}
-
 let toggleDarkMode = () => {
   Task.run(
     '/usr/bin/osascript',
@@ -123,6 +114,17 @@ Window.prototype.fullGridFrame = function() {
 Window.prototype.getBoxSize = function(screen) {
   const frame = this.screenFrame(screen);
   return [frame.width / GRID_WIDTH, frame.height / GRID_HEIGHT];
+}
+
+Window.prototype.gridCenterWithBorder = function(screen, yBorder = 1) {
+  const [boxWidth, boxHeight] = this.getBoxSize(screen);
+  const width = Math.round((GRID_HEIGHT - (yBorder * 2)) * boxHeight * 8 / 9 / boxWidth) * 2;
+  return {
+    x: Math.round((GRID_WIDTH - width) / 2),
+    y: yBorder,
+    width: width,
+    height: GRID_HEIGHT - (yBorder * 2)
+  };
 }
 
 Window.prototype.getGrid = function() {
@@ -256,7 +258,7 @@ Window.prototype.toRightToggle = function() {
 }
 
 Window.prototype.toCenterWithBorder = function(border = 1) {
-  this.setGrid(gridCenterWithBorder(border));
+  this.setGrid(this.gridCenterWithBorder(this.screen(), border));
 }
 
 Window.prototype.toTopRight = function() {
@@ -402,11 +404,13 @@ Window.prototype.toFullWidth = function() {
 }
 
 Window.prototype.toNextScreen = function() {
-  return this.setGrid(gridCenterWithBorder(), this.screen().next());
+  const screen = this.screen().next();
+  return this.setGrid(this.gridCenterWithBorder(screen), screen);
 }
 
 Window.prototype.toPreviousScreen = function() {
-  return this.setGrid(gridCenterWithBorder(), this.screen().previous());
+  const screen = this.screen().previous();
+  return this.setGrid(this.gridCenterWithBorder(screen), screen);
 }
 
 Window.prototype.showAppName = function() {
