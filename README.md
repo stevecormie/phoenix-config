@@ -36,7 +36,7 @@ Also ^⌥Z = Toggle left (75/50/25%), ^⌥X = Toggle right (75/50/25%)
 |E|R|T|
 |D|F|G|
 
-Also ^⌥C = Left two thirds, ^⌥V = Centre with border, ^⌥B = Right two thirds
+Also ^⌥C = Centre with border, ^⌥V = Left two thirds, ^⌥B = Right two thirds
 
 ### Eighths
 |   |   |   |   |

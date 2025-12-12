@@ -1,3 +1,7 @@
+// Config file for Phoenix window manager for Mac OS: https://github.com/kasper/phoenix/
+
+// Based on the config file by jasonm23: https://github.com/jasonm23/Phoenix-config
+
 Phoenix.notify("Phoenix config loading");
 
 Phoenix.set({
@@ -70,7 +74,9 @@ let toggleDarkMode = () => {
   );
 }
 
-/* Toggle the status of Tailscale, where toggletailscale.sh contains:
+/* Toggle the status of Tailscale
+
+For some unknown reason, Task.run() fails to execute the Tailscale CLI tool, so using a bash script, where toggletailscale.sh contains:
 
 #!/bin/bash
 TAILSCALE="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
@@ -86,6 +92,7 @@ if [ -f $TAILSCALE ]; then
 fi
 exit 1
 
+Put this in a .sh file and execute it below.
 */
 let toggleTailscale = () => {
   Task.run('/bin/bash', ['/Users/scormie/bin/toggletailscale.sh']);
@@ -506,8 +513,8 @@ bind_key('T', "Top Right Third", mash, () => focused().toTopRightThird());
 bind_key('D', "Bottom Left Third", mash, () => focused().toBottomLeftThird());
 bind_key('F', "Bottom Middle Third", mash, () => focused().toBottomMiddleThird());
 bind_key('G', "Bottom Right Third", mash, () => focused().toBottomRightThird());
-bind_key('C', "Left Two Thirds", mash, () => focused().toLeftTwoThirds());
-bind_key('V', "Center With Border", mash, () => focused().toCenterWithBorder());
+bind_key('C', "Center With Border", mash, () => focused().toCenterWithBorder());
+bind_key('V', "Left Two Thirds", mash, () => focused().toLeftTwoThirds());
 bind_key('B', "Right Two Thirds", mash, () => focused().toRightTwoThirds());
 bind_key("return", "Maximize Window", mash, () => focused().toFullScreen());
 bind_key("space", "Show App Name", mash, () => focused().showAppName());
