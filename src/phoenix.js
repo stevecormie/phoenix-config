@@ -224,25 +224,40 @@ Window.prototype.forgetFrame = function() {
   return delete lastFrames[this.uid()];
 }
 
+const positions = {
+  topHalf:            { x: 0,           y: 0,   width: 1,           height: 0.5 },
+  bottomHalf:         { x: 0,           y: 0.5, width: 1,           height: 0.5 },
+  leftHalf:           { x: 0,           y: 0,   width: 0.5,         height: 1   },
+  rightHalf:          { x: 0.5,         y: 0,   width: 0.5,         height: 1   }, 
+  topRight:           { x: 0.5,         y: 0,   width: 0.5,         height: 0.5 },
+  bottomRight:        { x: 0.5,         y: 0.5, width: 0.5,         height: 0.5 },
+  topLeft:            { x: 0,           y: 0,   width: 0.5,         height: 0.5 },
+  bottomLeft:         { x: 0,           y: 0.5, width: 0.5,         height: 0.5 },
+  topRightThird:      { x: (2.0 / 3.0), y: 0,   width: (1.0 / 3.0), height: 0.5 },
+  bottomRightThird:   { x: (2.0 / 3.0), y: 0.5, width: (1.0 / 3.0), height: 0.5 },
+  topMiddleThird:     { x: (1.0 / 3.0), y: 0,   width: (1.0 / 3.0), height: 0.5 },
+  bottomMiddleThird:  { x: (1.0 / 3.0), y: 0.5, width: (1.0 / 3.0), height: 0.5 },
+  topLeftThird:       { x: 0,           y: 0,   width: (1.0 / 3.0), height: 0.5 },
+  bottomLeftThird:    { x: 0,           y: 0.5, width: (1.0 / 3.0), height: 0.5 },
+  leftTwoThirds:      { x: 0,           y: 0,   width: (2.0 / 3.0), height: 1   },
+  rightTwoThirds:     { x: (1.0 / 3.0), y: 0,   width: (2.0 / 3.0), height: 1   },
+  rightTopRight:      { x: 0.75,        y: 0,   width: 0.25,        height: 0.5 },
+  rightBottomRight:   { x: 0.75,        y: 0.5, width: 0.25,        height: 0.5 },
+  rightTopLeft:       { x: 0.5,         y: 0,   width: 0.25,        height: 0.5 },
+  rightBottomLeft:    { x: 0.5,         y: 0.5, width: 0.25,        height: 0.5 },
+  leftTopRight:       { x: 0.25,        y: 0,   width: 0.25,        height: 0.5 },
+  leftBottomRight:    { x: 0.25,        y: 0.5, width: 0.25,        height: 0.5 },
+  leftTopLeft:        { x: 0,           y: 0,   width: 0.25,        height: 0.5 },
+  leftBottomLeft:     { x: 0,           y: 0.5, width: 0.25,        height: 0.5 }
+};
+
+Window.prototype.toPosition = function(position) {
+  return this.toGrid(positions[position]);
+}
+
 Window.prototype.togglingWidth = function() {
   const proportion = this.proportionWidth();
   return (proportion > 0.5) ? 0.5 : (proportion > 0.25) ? 0.25 : 0.75;
-}
-
-Window.prototype.toTopHalf = function() {
-  return this.toGrid({x: 0, y: 0, width: 1, height: 0.5});
-}
-
-Window.prototype.toBottomHalf = function() {
-  return this.toGrid({x: 0, y: 0.5, width: 1, height: 0.5});
-}
-
-Window.prototype.toLeftHalf = function() {
-  return this.toGrid({x: 0, y: 0, width: 0.5, height: 1});
-}
-
-Window.prototype.toRightHalf = function() {
-  return this.toGrid({x: 0.5, y: 0, width: 0.5, height: 1});
 }
 
 Window.prototype.toLeftToggle = function() {
@@ -268,134 +283,6 @@ Window.prototype.toCenterWithBorder = function(border = 1) {
   this.setGrid(this.gridCenterWithBorder(this.screen(), border));
 }
 
-Window.prototype.toTopRight = function() {
-  return this.toGrid({x: 0.5, y: 0, width: 0.5, height: 0.5});
-}
-
-Window.prototype.toBottomRight = function() {
-  return this.toGrid({x: 0.5, y: 0.5, width: 0.5, height: 0.5});
-}
-
-Window.prototype.toTopLeft = function() {
-  return this.toGrid({x: 0, y: 0, width: 0.5, height: 0.5});
-}
-
-Window.prototype.toBottomLeft = function() {
-  return this.toGrid({x: 0, y: 0.5, width: 0.5, height: 0.5});
-}
-
-Window.prototype.toTopRightThird = function() {
-  return this.toGrid({x: (2.0 / 3.0), y: 0, width: (1.0 / 3.0), height: 0.5});
-}
-
-Window.prototype.toBottomRightThird = function() {
-  return this.toGrid({x: (2.0 / 3.0), y: 0.5, width: (1.0 / 3.0), height: 0.5});
-}
-
-Window.prototype.toTopMiddleThird = function() {
-  return this.toGrid({x: (1.0 / 3.0), y: 0, width: (1.0 / 3.0), height: 0.5});
-}
-
-Window.prototype.toBottomMiddleThird = function() {
-  return this.toGrid({x: (1.0 / 3.0), y: 0.5, width: (1.0 / 3.0), height: 0.5});
-}
-
-Window.prototype.toTopLeftThird = function() {
-  return this.toGrid({x: 0, y: 0, width: (1.0 / 3.0), height: 0.5});
-}
-
-Window.prototype.toBottomLeftThird = function() {
-  return this.toGrid({x: 0, y: 0.5, width: (1.0 / 3.0), height: 0.5});
-}
-
-Window.prototype.toLeftTwoThirds = function() {
-  return this.toGrid({x: 0, y: 0, width: (2.0 / 3.0), height: 1});
-}
-
-Window.prototype.toRightTwoThirds = function() {
-  return this.toGrid({x: (1.0 / 3.0), y: 0, width: (2.0 / 3.0), height: 1});
-}
-
-Window.prototype.toRightTopRight = function() {
-  return this.toGrid({x: 0.75, y: 0, width: 0.25, height: 0.5});
-}
-
-Window.prototype.toRightBottomRight = function() {
-  return this.toGrid({x: 0.75, y: 0.5, width: 0.25, height: 0.5});
-}
-
-Window.prototype.toRightTopLeft = function() {
-  return this.toGrid({x: 0.5, y: 0, width: 0.25, height: 0.5});
-}
-
-Window.prototype.toRightBottomLeft = function() {
-  return this.toGrid({x: 0.5, y: 0.5, width: 0.25, height: 0.5});
-}
-
-Window.prototype.toLeftTopRight = function() {
-  return this.toGrid({x: 0.25, y: 0, width: 0.25, height: 0.5});
-}
-
-Window.prototype.toLeftBottomRight = function() {
-  return this.toGrid({x: 0.25, y: 0.5, width: 0.25, height: 0.5});
-}
-
-Window.prototype.toLeftTopLeft = function() {
-  return this.toGrid({x: 0, y: 0, width: 0.25, height: 0.5});
-}
-
-Window.prototype.toLeftBottomLeft = function() {
-  return this.toGrid({x: 0, y: 0.5, width: 0.25, height: 0.5});
-}
-
-Window.prototype.leftOneColumn = function() {
-  const frame = this.getGrid();
-  frame.x = Math.max(frame.x - 1, 0);
-  return this.setGrid(frame);
-}
-
-Window.prototype.downOneRow = function() {
-  const frame = this.getGrid();
-  frame.y = Math.min(Math.floor(frame.y + 1), GRID_HEIGHT - 1);
-  return this.setGrid(frame);
-}
-
-Window.prototype.upOneRow = function() {
-  const frame = this.getGrid();
-  frame.y = Math.max(Math.floor(frame.y - 1), 0);
-  return this.setGrid(frame);
-}
-
-Window.prototype.rightOneColumn = function() {
-  const frame = this.getGrid();
-  frame.x = Math.min(frame.x + 1, GRID_WIDTH - frame.width);
-  return this.setGrid(frame);
-}
-
-Window.prototype.growOneColumn = function() {
-  const frame = this.getGrid();
-  frame.width = Math.min(frame.width + 1, GRID_WIDTH - frame.x);
-  return this.setGrid(frame);
-}
-
-Window.prototype.shrinkOneColumn = function() {
-  const frame = this.getGrid();
-  frame.width = Math.max(frame.width - 1, 1);
-  return this.setGrid(frame);
-}
-
-Window.prototype.growOneRow = function() {
-  const frame = this.getGrid();
-  frame.height = Math.min(frame.height + 1, GRID_HEIGHT);
-  return this.setGrid(frame);
-}
-
-Window.prototype.shrinkOneRow = function() {
-  const frame = this.getGrid();
-  frame.height = Math.max(frame.height - 1, 1);
-  return this.setGrid(frame);
-}
-
 Window.prototype.toFullHeight = function() {
   const frame = this.getGrid();
   frame.y = 0;
@@ -407,6 +294,15 @@ Window.prototype.toFullWidth = function() {
   const frame = this.getGrid();
   frame.x = 0;
   frame.width = GRID_WIDTH;
+  return this.setGrid(frame);
+}
+
+Window.prototype.transformBy = function(dx, dy, dw, dh) {
+  const frame = this.getGrid();
+  frame.x = Math.max(0, Math.min(GRID_WIDTH - frame.width, frame.x + dx));
+  frame.y = Math.max(0, Math.min(GRID_HEIGHT - frame.height, frame.y + dy));
+  frame.width = Math.max(1, Math.min(GRID_WIDTH - frame.x, frame.width + dw));
+  frame.height = Math.max(1, Math.min(GRID_HEIGHT - frame.y, frame.height + dh));
   return this.setGrid(frame);
 }
 
@@ -497,45 +393,45 @@ const mash = "alt-ctrl".split('-');
 const smash = "alt-ctrl-shift".split('-');
 bind_key("right", "To Next Screen", smash, () => focused().toNextScreen());
 bind_key("left", "To Previous Screen", smash, () => focused().toPreviousScreen());
-bind_key("up", "Top Half", mash, () => focused().toTopHalf());
-bind_key("down", "Bottom Half", mash, () => focused().toBottomHalf());
-bind_key("left", "Left Half", mash, () => focused().toLeftHalf());
-bind_key("right", "Right Half", mash, () => focused().toRightHalf());
+bind_key("up", "Top Half", mash, () => focused().toPosition("topHalf"));
+bind_key("down", "Bottom Half", mash, () => focused().toPosition("bottomHalf"));
+bind_key("left", "Left Half", mash, () => focused().toPosition("leftHalf"));
+bind_key("right", "Right Half", mash, () => focused().toPosition("rightHalf"));
 bind_key('Z', "Left Side Toggle", mash, () => focused().toLeftToggle());
 bind_key('X', "Right Side Toggle", mash, () => focused().toRightToggle());
-bind_key('Q', "Top Left", mash, () => focused().toTopLeft());
-bind_key('W', "Top Right", mash, () => focused().toTopRight());
-bind_key('A', "Bottom Left", mash, () => focused().toBottomLeft());
-bind_key('S', "Bottom Right", mash, () => focused().toBottomRight());
-bind_key('E', "Top Left Third", mash, () => focused().toTopLeftThird());
-bind_key('R', "Top Middle Third", mash, () => focused().toTopMiddleThird());
-bind_key('T', "Top Right Third", mash, () => focused().toTopRightThird());
-bind_key('D', "Bottom Left Third", mash, () => focused().toBottomLeftThird());
-bind_key('F', "Bottom Middle Third", mash, () => focused().toBottomMiddleThird());
-bind_key('G', "Bottom Right Third", mash, () => focused().toBottomRightThird());
+bind_key('Q', "Top Left", mash, () => focused().toPosition("topLeft"));
+bind_key('W', "Top Right", mash, () => focused().toPosition("topRight"));
+bind_key('A', "Bottom Left", mash, () => focused().toPosition("bottomLeft"));
+bind_key('S', "Bottom Right", mash, () => focused().toPosition("bottomRight"));
+bind_key('E', "Top Left Third", mash, () => focused().toPosition("topLeftThird"));
+bind_key('R', "Top Middle Third", mash, () => focused().toPosition("topMiddleThird"));
+bind_key('T', "Top Right Third", mash, () => focused().toPosition("topRightThird"));
+bind_key('D', "Bottom Left Third", mash, () => focused().toPosition("bottomLeftThird"));
+bind_key('F', "Bottom Middle Third", mash, () => focused().toPosition("bottomMiddleThird"));
+bind_key('G', "Bottom Right Third", mash, () => focused().toPosition("bottomRightThird"));
 bind_key('C', "Center With Border", mash, () => focused().toCenterWithBorder());
-bind_key('V', "Left Two Thirds", mash, () => focused().toLeftTwoThirds());
-bind_key('B', "Right Two Thirds", mash, () => focused().toRightTwoThirds());
+bind_key('V', "Left Two Thirds", mash, () => focused().toPosition("leftTwoThirds"));
+bind_key('B', "Right Two Thirds", mash, () => focused().toPosition("rightTwoThirds"));
 bind_key("return", "Maximize Window", mash, () => focused().toFullScreen());
 bind_key("space", "Show App Name", mash, () => focused().showAppName());
-bind_key('Y', "Left Top Left", mash, () => focused().toLeftTopLeft());
-bind_key('U', "Left Top Right", mash, () => focused().toLeftTopRight());
-bind_key('H', "Left Bottom Left", mash, () => focused().toLeftBottomLeft());
-bind_key('J', "Left Bottom Right", mash, () => focused().toLeftBottomRight());
-bind_key('I', "Right Top Left", mash, () => focused().toRightTopLeft());
-bind_key('O', "Right Top Right", mash, () => focused().toRightTopRight());
-bind_key('K', "Right Bottom Left", mash, () => focused().toRightBottomLeft());
-bind_key('L', "Right Bottom Right", mash, () => focused().toRightBottomRight());
-bind_key(',', "Move Grid Left", mash, () => focused().leftOneColumn());
-bind_key('.', "Move Grid Right", mash, () => focused().rightOneColumn());
-bind_key('N', "Move Grid Up", mash, () => focused().upOneRow());
-bind_key('M', "Move Grid Down", mash, () => focused().downOneRow());
+bind_key('Y', "Left Top Left", mash, () => focused().toPosition("leftTopLeft"));
+bind_key('U', "Left Top Right", mash, () => focused().toPosition("leftTopRight"));
+bind_key('H', "Left Bottom Left", mash, () => focused().toPosition("leftBottomLeft"));
+bind_key('J', "Left Bottom Right", mash, () => focused().toPosition("leftBottomRight"));
+bind_key('I', "Right Top Left", mash, () => focused().toPosition("rightTopLeft"));
+bind_key('O', "Right Top Right", mash, () => focused().toPosition("rightTopRight"));
+bind_key('K', "Right Bottom Left", mash, () => focused().toPosition("rightBottomLeft"));
+bind_key('L', "Right Bottom Right", mash, () => focused().toPosition("rightBottomRight"));
+bind_key(',', "Move Grid Left", mash, () => focused().transformBy(-1, 0, 0, 0));
+bind_key('.', "Move Grid Right", mash, () => focused().transformBy(1, 0, 0, 0));
+bind_key('N', "Move Grid Up", mash, () => focused().transformBy(0, -1, 0, 0));
+bind_key('M', "Move Grid Down", mash, () => focused().transformBy(0, 1, 0, 0));
 bind_key('P', "Window Full Height", mash, () => focused().toFullHeight());
 bind_key(';', "Window Full Width", mash, () => focused().toFullWidth());
-bind_key('-', "Shrink by One Column", mash, () => focused().shrinkOneColumn());
-bind_key('=', "Grow by One Column", mash, () => focused().growOneColumn());
-bind_key('[', "Shrink by One Row", mash, () => focused().shrinkOneRow());
-bind_key(']', "Grow by One Row", mash, () => focused().growOneRow());
+bind_key('-', "Shrink by One Column", mash, () => focused().transformBy(0, 0, -1, 0));
+bind_key('=', "Grow by One Column", mash, () => focused().transformBy(0, 0, 1, 0));
+bind_key('[', "Shrink by One Row", mash, () => focused().transformBy(0, 0, 0, -1));
+bind_key(']', "Grow by One Row", mash, () => focused().transformBy(0, 0, 0, 1));
 bind_key("'", "Snap focused to grid", mash, () => focused().snapToGrid());
 bind_key("\\", "Snap all to grid", mash, snapAllToGrid);
 bind_key('1', "Save screen layout 1", smash, () => saveScreen("Layout1"));
