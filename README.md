@@ -16,6 +16,8 @@ Shortcuts are provided to move windows to halves, quarters, sixths and eighths o
 |---|
 |⏎|
 
+When a window is made full screen its current size is remembered, so that if the full screen shortcut is used again then the window will be restored to its original size.
+
 ### Halves
 |   |   |   |
 |---|---|---|
