@@ -358,9 +358,15 @@ const windowDidOpenEvent = new Event("windowDidOpen", (window) => {
 const appDidActivateEvent = new Event("appDidActivate", (app) => {
   const appWindows = app.windows();
   if (appWindows && (appWindows.length > 0)) {
+    let allMinimised = true;
     appWindows.forEach((window) => {
-      if (window.isMinimised()) window.unminimise();
+      allMinimised = allMinimised && window.isMinimised();
     });
+    if (allMinimised) {
+      appWindows.forEach((window) => {
+        window.unminimise();
+      });
+    }
   }
 });
 
