@@ -293,8 +293,10 @@ let focusOrStart = function(name) {
   let app = App.get(name);
   if (app == undefined) {
     app = App.launch(name, { focus: true });
+  } else {
+    app.activate();
+    app.focus();
   }
-  app.focus();
   return app;
 }
 
@@ -330,9 +332,11 @@ let restoreScreen = (tag) => {
         const app = focusOrStart(savedWindow.appName);
         if (app) {
           Timer.after(1.0, () => {
-            const appWindows = app.windows({ visible: true });
+            const appWindows = app.windows();
             if (appWindows && (appWindows.length > 0)) {
-              appWindows[0].setFrame(savedWindow.frame);
+              window = appWindows[0];
+              if (window.isMinimised()) window.unminimise();
+              window.setFrame(savedWindow.frame);
             }
           });
         }
