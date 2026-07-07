@@ -355,6 +355,15 @@ const windowDidOpenEvent = new Event("windowDidOpen", (window) => {
   }
 });
 
+const appDidActivateEvent = new Event("appDidActivate", (app) => {
+  const appWindows = app.windows();
+  if (appWindows && (appWindows.length > 0)) {
+    appWindows.forEach((window) => {
+      if (window.isMinimised()) window.unminimise();
+    });
+  }
+});
+
 // Key bindings
 
 let keys = [];
