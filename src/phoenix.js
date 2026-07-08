@@ -290,13 +290,7 @@ Window.prototype.showAppName = function() {
 // Save and restore screens
 
 let focusOrStart = function(name) {
-  let app = App.get(name);
-  if (app == undefined) {
-    app = App.launch(name, { focus: true });
-  } else {
-    app.activate();
-    app.focus();
-  }
+  app = App.launch(name, { focus: true });
   return app;
 }
 
